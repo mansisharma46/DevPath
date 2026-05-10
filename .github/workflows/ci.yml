@@ -1,4 +1,3 @@
-```yml
 # .github/workflows/ci.yml
 #
 # Continuous Integration for DevPath
@@ -87,4 +86,3 @@ jobs:
       - name: Run pytest
         run: |
           pytest tests/ -v --tb=short
-```
