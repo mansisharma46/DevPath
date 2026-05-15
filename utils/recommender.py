@@ -10,10 +10,10 @@ MAX_RESULTS = 3
 # Scoring weights used by the recommendation engine.
 # Higher weights mean that criterion has more influence
 # on the final recommendation score.
-WEIGHT_SKILL   = 3   # Skills are weighted highest because they best reflect project compatibility
-WEIGHT_LEVEL   = 2   # Matching experience level helps avoid projects that are too easy or too difficult
+WEIGHT_SKILL = 3   # highest because they best reflect project compatibility
+WEIGHT_LEVEL = 2   # helps avoid projects that are too easy or too difficult
 WEIGHT_INTEREST = 2   # Interest alignment improves recommendation relevance
-WEIGHT_TIME    = 1    # Time availability acts as a smaller tie-breaker factor
+WEIGHT_TIME = 1    # Time availability acts as a smaller tie-breaker factor
 
 
 # Common aliases and abbreviations for skills
@@ -36,7 +36,7 @@ def parse_skills(skills_string):
     Example:
     "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
     """
-    
+
     raw_skills = [
         s.strip().lower()
         for s in skills_string.split(",")
@@ -51,7 +51,9 @@ def parse_skills(skills_string):
     return normalized_skills
 
 
-def score_single_project(project, user_skills, level, interest, time_availability):
+def score_single_project(
+        project, user_skills,
+        level, interest, time_availability):
     """
     Calculate a numeric relevance score for one project.
 
@@ -69,7 +71,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     project_skills = [s.lower() for s in project.get("skills", [])]
     # Count how many user skills overlap with the
     # skills required by the current project.
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills) 
+    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
     # Add weighted points based on the number of matching skills.
     # More overlapping skills result in a higher recommendation score.
     score += matched_skills * WEIGHT_SKILL
