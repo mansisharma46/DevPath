@@ -194,7 +194,7 @@ cause a path traversal vulnerability.
 
 DevPath uses Flask's built-in Jinja2 templating. Templates receive data through
 `render_template()` keyword arguments. The project detail template uses
-`{{ project.title }}`, `{% for step in project.roadmap %}`, and similar
+{% raw %}`{{ project.title }}`{% endraw %}, {% raw %}`{% for step in project.roadmap %}`{% endraw %}, and similar
 expressions to render dynamic content server-side.
 
 No client-side template engine is used. The frontend JavaScript only handles
