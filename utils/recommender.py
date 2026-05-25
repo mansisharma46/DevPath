@@ -44,6 +44,8 @@ def parse_skills(skills_string):
     """
     import json
 
+    # Skills are serialized as JSON arrays.
+    # Legacy comma-separated values remain supported for compatibility.
     try:
         # Preferred path: frontend sends a JSON-serialized array
         parsed = json.loads(skills_string)
