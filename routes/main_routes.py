@@ -157,3 +157,32 @@ def sitemap():
 def robots():
     """Serve robots.txt from the static folder."""
     return send_from_directory("static", "robots.txt", mimetype="text/plain")
+
+@main.route("/api/search")
+def search_projects():
+    """Return projects matching the user's search query."""
+
+    query = request.args.get("q", "").strip().lower()
+
+    if not query:
+        return jsonify([])
+
+    projects = load_all_projects()
+    filtered_projects = []
+
+    for project in projects:
+
+        # Combine searchable project fields into one lowercase string
+        searchable_text = " ".join([
+            project.get("title", ""),
+            project.get("description", ""),
+            project.get("interest", ""),
+            " ".join(project.get("skills", [])),
+            " ".join(project.get("tech_stack", [])),
+            " ".join(project.get("features", []))
+        ]).lower()
+
+        if query in searchable_text:
+            filtered_projects.append(project)
+
+    return jsonify(filtered_projects)
