@@ -856,9 +856,11 @@ if (isIndexPage) {
   }
 }
 
-// ============================================================
-// Scroll to top
-// ============================================================
+} // end github modal handlers
+
+/* ---- Scroll-to-top button ---- */
+
+/* Show the button only when the user has scrolled more than 300px */
 var SCROLL_THRESHOLD = 300;
 
 var scrollTopBtn = document.getElementById("scroll-top-btn");
