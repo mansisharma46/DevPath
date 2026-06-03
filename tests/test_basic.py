@@ -242,6 +242,20 @@ def test_get_recommendations_result_format():
         assert "title" in project
 
 
+def test_case_insensitive_recommendations_identical():
+    """Lowercase and titlecase skill inputs must produce identical recommendations."""
+    results_lower = get_recommendations("python", "Beginner", "Data", "Low")
+    results_title = get_recommendations("Python", "Beginner", "Data", "Low")
+    assert [p["id"] for p in results_lower] == [p["id"] for p in results_title]
+
+
+def test_whitespace_stripped_in_skills():
+    """Leading/trailing whitespace in the skills string must be ignored."""
+    results_clean = get_recommendations("python", "Beginner", "Data", "Low")
+    results_spaced = get_recommendations("   python  ", "Beginner", "Data", "Low")
+    assert [p["id"] for p in results_clean] == [p["id"] for p in results_spaced]
+
+
 # ============================================================
 # Input validation tests
 # ============================================================

@@ -193,7 +193,7 @@ var errorMsg = document.getElementById('github-modal-error');
 // ============================================================
 (function initMobileNav() {
   var toggle = document.getElementById("nav-mobile-toggle"); //hamburger button
-  var menu = document.getElementById("nav-mobile-menu"); //dropdown menu 
+  var menu   = document.getElementById("nav-mobile-menu"); //dropdown menu
 
   // Nothing to do if the nav isn't on this page, just bail out
   if (!toggle || !menu) return;
@@ -217,6 +217,14 @@ var errorMsg = document.getElementById('github-modal-error');
       toggle.setAttribute("aria-expanded", "false");
     });
   });
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth >= 640) {
+      menu.classList.remove("open");
+      toggle.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
+    }
+  });
 })();
 
 
@@ -227,19 +235,19 @@ if (isIndexPage) {
 
   // DOM references
   // grabbing all the elements we'll need so we're not calling getElementById over and over again throughout the code
-  var form = document.getElementById("recommend-form");
-  var submitBtn = document.getElementById("submit-btn");
-  var btnLabel = document.getElementById("btn-label"); // "get recommendations" text 
-  var btnLoading = document.getElementById("btn-loading"); // spinner icon inside the button 
-  var resultsSection = document.getElementById("results-section");
-  var resultsGrid = document.getElementById("results-grid");
-  var resultsLoadingEl = document.getElementById("results-loading"); // "Loading..." text in the results 
-  var resultsEmptyEl = document.getElementById("results-empty");
-  var emptyMessageEl = document.getElementById("empty-message");
-  var skillsHidden = document.getElementById("skills"); // the hidden input that holds skills list
-  var skillsTextInput = document.getElementById("skills-input"); //visible text box in which user types skills
-  var chipsSelectedEl = document.getElementById("skill-chips-selected"); //selected skills tags container
-  var quickPickChips = document.querySelectorAll(".skill-chip"); // predefined skills user can click
+  var form              = document.getElementById("recommend-form");
+  var submitBtn         = document.getElementById("submit-btn");
+  var btnLabel          = document.getElementById("btn-label"); // "get recommendations" text
+  var btnLoading        = document.getElementById("btn-loading"); // spinner icon inside the button
+  var resultsSection    = document.getElementById("results-section");
+  var resultsGrid       = document.getElementById("results-grid");
+  var resultsLoadingEl  = document.getElementById("results-loading"); // "Loading..." text in the results
+  var resultsEmptyEl    = document.getElementById("results-empty");
+  var emptyMessageEl    = document.getElementById("empty-message");
+  var skillsHidden      = document.getElementById("skills"); // the hidden input that holds skills list
+  var skillsTextInput   = document.getElementById("skills-input"); //visible text box in which user types skills
+  var chipsSelectedEl   = document.getElementById("skill-chips-selected"); //selected skills tags container
+  var quickPickChips    = document.querySelectorAll(".skill-chip"); // predefined skills user can click
 
   // Tracks currently selected skills to prevent duplicates
   var selectedSkills = [];
@@ -683,62 +691,69 @@ if (isIndexPage) {
   // ----------------------------------------------------------
 
   form.addEventListener("submit", function (evt) {
-    evt.preventDefault(); //stop the browser from reloading the page on form submit
-    clearAllErrors()
+  evt.preventDefault();
 
-    if (skillsTextInput.value.trim()) {
-      addSkill(skillsTextInput.value);
-      skillsTextInput.value = "";
-      hideSuggestions();
-    }
+  clearAllErrors();
 
-    if (!validateForm()) return; //stop - anything missing/invalid
+  if (skillsTextInput.value.trim()) {
+    addSkill(skillsTextInput.value);
+    skillsTextInput.value = "";
+    hideSuggestions();
+  }
 
-    setLoadingState(true);
+  if (!validateForm()) return;
 
-    // Allow browser to paint spinner before request starts
-    requestAnimationFrame(function () {
+  setLoadingState(true);
 
-      var payload = {
-        skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
-        level: document.getElementById("level").value,
-        interest: document.getElementById("interest").value,
-        time: document.getElementById("time").value
-      };
+  requestAnimationFrame(function () {
 
-      fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+    var payload = {
+      skills: skillsHidden.value.trim() || skillsTextInput.value.trim(),
+      level: document.getElementById("level").value,
+      interest: document.getElementById("interest").value,
+      time: document.getElementById("time").value
+    };
+
+    fetch("/api/recommend", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) {
+        return res.json();
       })
-        .then(function (res) {
-          return res.json();
-        })
-        .then(function (data) {
+      .then(function (data) {
 
-          setLoadingState(false);
+        setLoadingState(false);
 
-          if (data.error) {
-            var generalErr = document.getElementById("form-error-general");
-
-            if (generalErr) {
-              generalErr.textContent = data.error;
-            }
-
-            return;
-          }
-
-          renderResults(data.projects || [], data.message);
-        })
-        .catch(function () {
-          setLoadingState(false);
+        if (data.error) {
           var generalErr = document.getElementById("form-error-general");
           if (generalErr) {
-            generalErr.textContent = "An error occurred. Please try again.";
+            generalErr.textContent = data.error;
           }
-        });
-    });
+
+          return;
+        }
+
+        renderResults(data.projects || [], data.message);
+      })
+      .catch(function (err) {
+
+        setLoadingState(false);
+
+        var generalErr = document.getElementById("form-error-general");
+
+        if (generalErr) {
+          generalErr.textContent =
+            "Something went wrong. Please try again.";
+        }
+
+        console.error("API request failed:", err);
+      });
   });
+});
 
   // Manages the loading state of the form and results section(whats visible or not)
   function setLoadingState(isLoading) {
@@ -767,6 +782,7 @@ if (isIndexPage) {
   // Render result cards
   // ----------------------------------------------------------
 
+ main
   function truncate(text, maxLength) {
     if (!text) return "";
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
@@ -777,6 +793,42 @@ if (isIndexPage) {
     span.className = "project-tag project-tag--" + type;
     span.textContent = text;
     return span;
+
+  //takes the array of projects from the api and draws them on the page as cards
+  //if array is empty it shows the "no results" message instead
+  function renderResults(projects, message) {
+    resultsSection.style.display = "block";
+    resultsLoadingEl.style.display = "none";
+    // Clear out any cards from a previous search before showing new ones
+    resultsGrid.innerHTML = "";
+
+    if (!projects || projects.length === 0) {
+      resultsGrid.style.display = "none";
+      resultsEmptyEl.style.display = "block";
+
+      // Show a friendly custom message when the user selected an interest
+      var selectedInterest = document.getElementById("interest")?.value;
+      if (selectedInterest) {
+        emptyMessageEl.textContent = "No projects are currently available for this interest. Please check back later or try a different area.";
+      } else if (message) {
+        emptyMessageEl.textContent = message;
+      } else {
+        emptyMessageEl.textContent = "Try adjusting your skills or choosing a different interest area.";
+      }
+
+      resultsSection.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
+    resultsEmptyEl.style.display = "none";
+    resultsGrid.style.display = "grid";
+
+    projects.forEach(function (project) {
+      resultsGrid.appendChild(buildProjectCard(project));
+    });
+
+    resultsSection.scrollIntoView({ behavior: "smooth" });
+ main
   }
 
   function buildProjectCard(project) {
@@ -904,11 +956,268 @@ if (isIndexPage) {
       document.body.style.overflow = "";
     }
 
+    // Render code string as a list of DOM rows where each row contains a
+    // line-number gutter cell and a code cell. Returning DOM nodes instead
+    // of an HTML string avoids innerHTML XSS risks from the code content.
+    function renderCodeWithLineNumbers(code) {
+      var lines = (code || "").split("\n");
+      return lines.map(function (line, index) {
+        var row = document.createElement("div");
+        row.className = "code-line";
+
+        var lineNum = document.createElement("span");
+        lineNum.className = "code-line-number";
+        lineNum.setAttribute("aria-hidden", "true");
+        lineNum.textContent = index + 1;
+
+        var lineCode = document.createElement("span");
+        lineCode.className = "code-line-content";
+        lineCode.textContent = line;
+
+        row.appendChild(lineNum);
+        row.appendChild(lineCode);
+        return row;
+      });
+    }
+
     //fetches the starter code from the server via an API call
     //inserts the code into the panel and handles loading/error states
     function fetchStarterCode() {
       // Show a loading message while we wait for the API response
       if (codeContentEl) codeContentEl.textContent = "Loading starter code...";
+
+
+  // ----------------------------------------------------------
+  // Copy Code button
+  // ----------------------------------------------------------
+  var btnCopyCode  = document.getElementById("btn-copy-code");
+
+   // ============================================================
+// ROADMAP PROGRESS TRACKER
+// ============================================================
+
+
+var roadmapCheckboxes = document.querySelectorAll(
+    ".roadmap-checkbox"
+);
+
+var progressFill = document.getElementById(
+    "roadmap-progress-fill"
+);
+
+var progressText = document.getElementById(
+    "roadmap-progress-text"
+);
+
+var progressBar = document.querySelector(
+    ".roadmap-progress-bar"
+);
+
+// Local storage key
+var roadmapStorageKey =
+    `devpath-roadmap-progress-${PROJECT_ID}`;
+
+
+// ------------------------------------------------------------
+// Restore saved roadmap state
+// ------------------------------------------------------------
+
+var savedRoadmapState =
+    localStorage.getItem(
+        roadmapStorageKey
+    );
+
+if(savedRoadmapState){
+
+    try{
+
+        var parsedState =
+            JSON.parse(savedRoadmapState);
+
+        roadmapCheckboxes.forEach(
+            function(cb,index){
+
+                cb.checked =
+                    !!parsedState[index];
+
+            }
+        );
+
+    } catch(error){
+
+        console.error(
+            "Failed to restore roadmap progress",
+            error
+        );
+
+    }
+}
+
+
+// ------------------------------------------------------------
+// Update roadmap progress
+// ------------------------------------------------------------
+
+function updateRoadmapProgress(){
+
+    if(!roadmapCheckboxes.length){
+        return;
+    }
+
+    var completed = 0;
+
+    roadmapCheckboxes.forEach(function(cb){
+
+        var step = cb.closest(
+            ".roadmap-step"
+        );
+
+        if(cb.checked){
+
+            completed++;
+
+            if(step){
+                step.classList.add(
+                    "completed"
+                );
+            }
+
+        } else {
+
+            if(step){
+                step.classList.remove(
+                    "completed"
+                );
+            }
+
+        }
+
+    });
+
+    var percent = Math.round(
+        (completed / roadmapCheckboxes.length)
+        * 100
+    );
+
+    // Update progress bar fill
+    if(progressFill){
+
+        progressFill.style.width =
+            percent + "%";
+
+    }
+
+    // Update progress text
+    if(progressText){
+
+        progressText.textContent =
+            percent + "% completed";
+
+    }
+
+    // Accessibility update
+    if(progressBar){
+
+        progressBar.setAttribute(
+            "aria-valuenow",
+            percent
+        );
+
+    }
+
+    // Save checkbox state
+    var savedState = [];
+
+    roadmapCheckboxes.forEach(function(cb){
+
+        savedState.push(
+            cb.checked
+        );
+
+    });
+
+    localStorage.setItem(
+        roadmapStorageKey,
+        JSON.stringify(savedState)
+    );
+
+}
+
+
+// ------------------------------------------------------------
+// Attach checkbox listeners
+// ------------------------------------------------------------
+
+roadmapCheckboxes.forEach(function(cb){
+
+    cb.addEventListener(
+        "change",
+        updateRoadmapProgress
+    );
+
+});
+
+
+// ------------------------------------------------------------
+// Initial progress render
+// ------------------------------------------------------------
+
+updateRoadmapProgress();
+  var copyToast    = document.getElementById("copy-toast");
+  var toastTimeout = null;
+
+  var copyToast    = document.getElementById("copy-toast"); //popup msg when copied 
+  var toastTimeout = null; 
+
+
+  //shows the "copied to clipboard" state on the button and the toast message, then resets after a short delay
+  function showCopySuccess() {
+    if (!btnCopyCode) return;
+
+    // Swap icons on the button(copy and checkmark icons)
+    var copyIcon  = btnCopyCode.querySelector(".copy-icon");
+    var checkIcon = btnCopyCode.querySelector(".check-icon");
+    var btnLabel = btnCopyCode.querySelector(".copy-btn-label");
+
+    if (copyIcon) copyIcon.style.display = "none";
+    if (checkIcon) checkIcon.style.display = "inline";
+    if (btnLabel) btnLabel.textContent = "Copied!";
+    btnCopyCode.classList.add("copied");
+    // Disable button so user can't spam click it while toast is showing
+    btnCopyCode.disabled = true;
+
+    // Show toast
+    if (copyToast) {
+      copyToast.classList.add("show");
+    }
+
+    // Auto-reset after 2.5 s
+    // Clear any previous timeout first so timers don't stack up
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function () {
+      if (copyIcon) copyIcon.style.display = "inline";
+      if (checkIcon) checkIcon.style.display = "none";
+      if (btnLabel) btnLabel.textContent = "Copy Code";
+      btnCopyCode.classList.remove("copied");
+      btnCopyCode.disabled = false;
+      if (copyToast) copyToast.classList.remove("show");
+    }, 2500);
+  }
+
+  if (btnCopyCode) {
+    btnCopyCode.addEventListener("click", function () {
+      var code = codeContentEl
+        ? Array.from(codeContentEl.querySelectorAll(".line-content"))
+          .map(function (el) { return el.textContent; })
+          .join("\n")
+        : "";
+      // Don't copy if the code hasn't loaded yet — just ignore the click
+      if (!code || code === "Loading..." || code === "Loading starter code...") return;
+
+      // Use Clipboard API with textarea fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(showCopySuccess).catch(function () {
+          fallbackCopy(code); // clipboard api failed, try the old way
 
       fetch("/project/" + PROJECT_ID + "/code")
         .then(function (res) { return res.json(); })
@@ -1124,6 +1433,7 @@ if (isIndexPage) {
     }
   }
 
+ main
   if (scrollTopBtn) {
     window.addEventListener('scroll', handleScroll, { passive: true });
     scrollTopBtn.addEventListener('click', function () {
@@ -1136,3 +1446,10 @@ if (isIndexPage) {
     handleScroll();
   }
 }());
+
+/* Only wire up listeners if the button exists on this page */
+if (scrollTopBtn) {
+    window.addEventListener('scroll', handleScroll);
+    scrollTopBtn.addEventListener('click', scrollToTop);
+}
+ main
