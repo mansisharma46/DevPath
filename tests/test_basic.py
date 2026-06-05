@@ -196,6 +196,32 @@ def test_parse_skills_single_entry():
     assert parse_skills("JavaScript") == ["javascript"]
 
 
+def test_parse_skills_valid_json_array():
+    """parse_skills should parse a valid JSON array of skills."""
+    result = parse_skills('["Python","React"]')
+    assert result == ["python", "react"]
+
+
+def test_parse_skills_malformed_json_handling():
+    """parse_skills should handle malformed JSON gracefully using fallback."""
+    # Should not crash, and parses via fallback comma-splitting behavior
+    result = parse_skills('["Python",]')
+    assert isinstance(result, list)
+    assert len(result) > 0
+
+
+def test_parse_skills_legacy_fallback():
+    """parse_skills should parse a legacy comma-separated string."""
+    result = parse_skills("Python,React")
+    assert result == ["python", "react"]
+
+
+def test_parse_skills_containing_commas():
+    """parse_skills should preserve skill names containing commas when using JSON."""
+    result = parse_skills('["HTML, CSS","JavaScript"]')
+    assert result == ["html, css", "javascript"]
+
+
 def test_score_single_project_full_match():
     """A project that matches all four criteria should receive the maximum score."""
     project = {

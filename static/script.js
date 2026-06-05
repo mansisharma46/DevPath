@@ -915,9 +915,6 @@ if (resetProgressBtn) {
     if (!skillsHidden) {
       var skillsHidden = document.getElementById("skills");
     }
-    // Keep the hidden <input> in sync for form serialisation
-    // The API expects a comma-separated string, so join the array that way
-    skillsHidden.value = selectedSkills.join(", ");
   }
 
   updateQuickPickState();
