@@ -1165,5 +1165,160 @@
         ],
         "id": 32,
         "starter_code": "starter_code/generated/32_cybersecurity_port_scanner.txt"
+    },
+    {
+        "title": "Real-Time Collaboration Board",
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "React"
+        ],
+        "level": "Advanced",
+        "interest": "Web Development",
+        "time": "High",
+        "description": "Build a real-time multiplayer whiteboard application where users can draw, add sticky notes, and chat simultaneously. Excellent for learning WebSockets and state synchronization.",
+        "features": [
+            "Real-time cursors",
+            "WebSocket sync",
+            "Export as image"
+        ],
+        "tech_stack": [
+            "React",
+            "Node.js",
+            "Socket.io"
+        ],
+        "roadmap": [
+            "Step 1: Setup React",
+            "Step 2: Add Canvas",
+            "Step 3: Add Socket.io"
+        ],
+        "resources": [
+            "Socket.io Docs: https://socket.io/docs/v4/"
+        ],
+        "id": 33,
+        "starter_code": "starter_code/generated/33_real_time_collaboration_board.txt"
+    },
+    {
+        "title": "Automated Social Media Publisher",
+        "skills": [
+            "Python",
+            "APIs"
+        ],
+        "level": "Intermediate",
+        "interest": "Automation",
+        "time": "Medium",
+        "description": "Create a script that reads content from a CSV file and automatically schedules and publishes posts to Twitter.",
+        "features": [
+            "CSV reading",
+            "Rate limiting",
+            "OAuth2 auth"
+        ],
+        "tech_stack": [
+            "Python",
+            "Tweepy"
+        ],
+        "roadmap": [
+            "Step 1: Register API key",
+            "Step 2: Parse CSV",
+            "Step 3: Publish to Twitter"
+        ],
+        "resources": [
+            "Tweepy Docs: https://docs.tweepy.org/"
+        ],
+        "id": 34,
+        "starter_code": "starter_code/generated/34_automated_social_media_publisher.txt"
+    },
+    {
+        "title": "Dockerized CI/CD Dashboard",
+        "skills": [
+            "Go",
+            "Docker"
+        ],
+        "level": "Advanced",
+        "interest": "DevOps / Cloud",
+        "time": "High",
+        "description": "Develop a microservice that aggregates CI/CD pipeline statuses from GitHub Actions and GitLab CI, displaying them in a unified terminal dashboard.",
+        "features": [
+            "Webhook handling",
+            "Dockerization",
+            "API polling"
+        ],
+        "tech_stack": [
+            "Go",
+            "Docker",
+            "GitHub Actions API"
+        ],
+        "roadmap": [
+            "Step 1: HTTP Server",
+            "Step 2: API polling",
+            "Step 3: Dockerfile"
+        ],
+        "resources": [
+            "Docker Docs: https://docs.docker.com/"
+        ],
+        "id": 35,
+        "starter_code": "starter_code/generated/35_dockerized_ci_cd_dashboard.txt"
+    },
+    {
+        "title": "AI Story Generator Wrapper",
+        "skills": [
+            "Python",
+            "Flask",
+            "JavaScript"
+        ],
+        "level": "Intermediate",
+        "interest": "AI / ML",
+        "time": "Medium",
+        "description": "Build a web app that takes a character name and genre, then queries a Large Language Model to generate a custom short story.",
+        "features": [
+            "Form inputs",
+            "Streaming response",
+            "Rate limiting"
+        ],
+        "tech_stack": [
+            "Python",
+            "Flask",
+            "OpenAI API"
+        ],
+        "roadmap": [
+            "Step 1: Flask backend",
+            "Step 2: API Integration",
+            "Step 3: Frontend UI"
+        ],
+        "resources": [
+            "OpenAI Docs: https://platform.openai.com/docs/"
+        ],
+        "id": 36,
+        "starter_code": "starter_code/generated/36_ai_story_generator_wrapper.txt"
+    },
+    {
+        "title": "Focus Pomodoro Timer",
+        "skills": [
+            "Kotlin"
+        ],
+        "level": "Beginner",
+        "interest": "Mobile Development",
+        "time": "Low",
+        "description": "A beautiful, minimalist Pomodoro timer application for Android that helps users maintain focus using the 25/5 minute work-rest technique.",
+        "features": [
+            "Custom intervals",
+            "Push notifications",
+            "Daily stats"
+        ],
+        "tech_stack": [
+            "Kotlin",
+            "Android SDK",
+            "Room"
+        ],
+        "roadmap": [
+            "Step 1: UI layout",
+            "Step 2: CountDownTimer",
+            "Step 3: Local notifications"
+        ],
+        "resources": [
+            "Android Devs: https://developer.android.com/"
+        ],
+        "id": 37,
+        "starter_code": "starter_code/generated/37_focus_pomodoro_timer.txt"
     }
 ]

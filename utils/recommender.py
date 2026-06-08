@@ -94,15 +94,22 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 
     # Compare user's skills against the project's required skills
     project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    # Count how many user skills overlap with the
-    # skills required by the current project.
-    matched_skills = sum(1 for skill in user_skills if skill in project_skills)
+    
+    # Use partial matching for skills to be more forgiving
+    matched_skills = 0
+    for u_skill in user_skills:
+        if any(u_skill in p_skill or p_skill in u_skill for p_skill in project_skills):
+            matched_skills += 1
+            
     score += matched_skills * SCORING_WEIGHTS["skill"]
 
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
 
-    if project.get("interest", "").lower() == interest.lower():
+    p_interest = project.get("interest", "").lower()
+    u_interest = interest.lower()
+    # Use partial matching for interest as well
+    if p_interest == u_interest or (u_interest and u_interest in p_interest) or (p_interest and p_interest in u_interest):
         score += SCORING_WEIGHTS["interest"]
 
     if project_time == user_time:
