@@ -47,19 +47,16 @@ _CLUSTERS_PATH = os.path.join(
 # Skill parsing
 # ---------------------------------------------------------------------------
 
-def parse_skills(skills_string):
-    """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
-
-    Example:
-        "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
-    """
-    raw_skills = [
-        s.strip().lower()
-        for s in skills_string.split(",")
-        if s.strip()
-    ]
+def parse_skills(skills_input):
+    if isinstance(skills_input, list):
+        raw_skills = skills_input
+    else:
+        try:
+            parsed = json.loads(skills_input)
+            raw_skills = parsed if isinstance(parsed, list) else [str(parsed)]
+        except (json.JSONDecodeError, TypeError):
+            raw_skills = skills_input.split(",") if isinstance(skills_input, str) else []
+    raw_skills = [str(s).strip().lower() for s in raw_skills if str(s).strip()]
     return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
 
 
@@ -211,6 +208,14 @@ def get_recommendations(skills_string, level, interest, time_availability):
 
 VALID_LEVELS = ["beginner", "intermediate", "advanced"]
 VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+
+
+VALID_INTERESTS = {
+    "web", "data", "education", "automation", "games",
+    "cybersecurity", "devops", "mobile", "machine learning/ai",
+    "artificial intelligence", "cloud computing", "mobile app development",
+    "backend", "tools"
+}
 
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
