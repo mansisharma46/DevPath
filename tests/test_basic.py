@@ -29,10 +29,14 @@ from utils.recommender import (
     validate_recommendation_inputs,
     parse_skills,
     score_single_project,
-    WEIGHT_LEVEL,
-    WEIGHT_INTEREST,
-    WEIGHT_TIME,
+    SCORING_WEIGHTS,
+    VALID_LEVELS,
+    VALID_TIME_AVAILABILITY,
 )
+
+WEIGHT_LEVEL    = SCORING_WEIGHTS["level"]
+WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
+WEIGHT_TIME     = SCORING_WEIGHTS["time"]
 from app import app, internal_server_error
 
 

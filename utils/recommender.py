@@ -49,19 +49,29 @@ _CLUSTERS_PATH = os.path.join(
 
 def parse_skills(skills_string):
     """
-    Convert a raw comma-separated skills string into
-    a normalized lowercase list.
+    Convert a raw skills string into a normalized lowercase list.
+    Accepts either a JSON array (e.g. '["Python","React"]') or a
+    comma-separated string (e.g. "JS, HTML5, CSS3").
 
     Example:
-        "JS, HTML5, CSS3" -> ["javascript", "html", "css"]
+        '["Python","React"]' -> ["python", "react"]
+        "JS, HTML5, CSS3"   -> ["javascript", "html", "css"]
     """
+    stripped = skills_string.strip()
+    if stripped.startswith("["):
+        try:
+            parsed = json.loads(stripped)
+            if isinstance(parsed, list):
+                raw_skills = [str(s).strip().lower() for s in parsed if str(s).strip()]
+                return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
+        except (json.JSONDecodeError, ValueError):
+            pass
     raw_skills = [
         s.strip().lower()
         for s in skills_string.split(",")
         if s.strip()
     ]
     return [SKILL_ALIASES.get(skill, skill) for skill in raw_skills]
-
 
 # ---------------------------------------------------------------------------
 # Scoring
@@ -100,7 +110,11 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
     # Count how many user skills overlap with the
     # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
-    score += matched_skills * SCORING_WEIGHTS["skill"]
+    if project_skills:
+        coverage = matched_skills / len(project_skills)
+        score += matched_skills * SCORING_WEIGHTS["skill"] * coverage
+    else:
+        score += matched_skills * SCORING_WEIGHTS["skill"]
 
     if project.get("level", "").lower() == level.lower():
         score += SCORING_WEIGHTS["level"]
@@ -203,15 +217,11 @@ def get_recommendations(skills_string, level, interest, time_availability):
     cluster_data = _load_clusters()
     related = _get_related(top_ids, all_projects, cluster_data) if cluster_data else []
 
-    return {
-        "recommendations": top_projects,
-        "related":         related,
-    }
+    return top_projects
 
 
 VALID_LEVELS = ["beginner", "intermediate", "advanced"]
 VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
-
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []
@@ -226,8 +236,8 @@ def validate_recommendation_inputs(skills, level, interest, time_availability):
     elif level.strip().lower() not in VALID_LEVELS:
         errors.append("Invalid experience level. Choose Beginner, Intermediate, or Advanced.")
 
-    if not interest or not isinstance(interest, str) or interest.strip().lower() not in VALID_INTERESTS:
-        errors.append("Please select a valid area of interest.")
+    if not interest or not isinstance(interest, str) or not interest.strip():
+        errors.append("Please select an area of interest.")
 
     if not time_availability or not time_availability.strip():
         errors.append("Please select your time availability.")
