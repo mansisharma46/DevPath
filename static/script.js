@@ -42,6 +42,82 @@
   initTheme();
 })();
 
+// ============================================================
+// Detect which page we are on
+// ============================================================
+var isIndexPage = !!document.getElementById("recommend-form");
+// !! trick turns the DOM result into a simple true/false
+var isIndexPage = !!document.getElementById("recommend-form");
+// PROJECT_ID is set by the server only on detail pages, so if it's missing we're elsewhere
+var isDetailPage = typeof PROJECT_ID !== "undefined";
+var modal = document.getElementById('github-modal-overlay');
+var openModalBtn = document.getElementById('btn-show-github'); // The trigger in your main form
+var closeModalBtn = document.getElementById('btn-close-github');
+var fetchBtn = document.getElementById('btn-fetch-github');
+var githubInput = document.getElementById('github-username');
+var errorMsg = document.getElementById('github-modal-error');
+
+// ============================================================
+// Lenis Smooth Scrolling Initialization (runs on all pages)
+// ============================================================
+(function initLenis() {
+  // Respect user's motion preferences for accessibility
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  
+  // Don't initialize smooth scrolling if user prefers reduced motion
+  if (prefersReducedMotion.matches) {
+    return;
+  }
+  
+  // Check if Lenis is available (CDN loaded successfully)
+  if (typeof Lenis === 'undefined') {
+    console.warn('Lenis library not loaded. Smooth scrolling disabled.');
+    return;
+  }
+  
+  var lenis = new Lenis({
+    duration: 1.2,
+    easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+    smoothWheel: true,
+    smoothTouch: false
+  });
+
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  
+  requestAnimationFrame(raf);
+
+  // Integrate with anchor links for smooth navigation
+  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+    anchor.addEventListener('click', function (e) {
+      var href = this.getAttribute('href');
+      if (href === '#') return;
+      
+      e.preventDefault();
+      var target = document.querySelector(href);
+      if (target) {
+        lenis.scrollTo(target, {
+          offset: 0,
+          duration: 1.2
+        });
+      }
+    });
+  });
+  
+  // Listen for preference changes (user changes system settings while page is open)
+  prefersReducedMotion.addEventListener('change', function() {
+    if (prefersReducedMotion.matches) {
+      lenis.destroy();
+    }
+  });
+})();
+
+
+// ============================================================
+// Mobile navigation toggle (runs on all pages)
+// ============================================================
 (function initMobileNav() {
   var toggle = document.getElementById("nav-mobile-toggle");
   var menu = document.getElementById("nav-mobile-menu");
