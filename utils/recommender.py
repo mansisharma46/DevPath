@@ -121,12 +121,21 @@ def ml_similarity_score(project, user_skills, level, interest, time_availability
     return _cosine_similarity(user_vector, project_vector)
 
 def score_single_project(project, user_skills, level, interest, time_availability):
+    TIME_RANKS = ["low", "medium", "high"]
+
+    user_time    = time_availability.strip().lower()
+    project_time = project.get("time", "").strip().lower()
+
+    # If the project needs more time than the user has, exclude it.
+    if project_time not in TIME_RANKS or user_time not in TIME_RANKS:
+        return 0
+    if TIME_RANKS.index(project_time) > TIME_RANKS.index(user_time):
+        return 0
+
     score = 0
 
     # Compare user's skills against the project's required skills
     project_skills = [SKILL_ALIASES.get(s.lower(), s.lower()) for s in project.get("skills", [])]
-    # Count how many user skills overlap with the
-    # skills required by the current project.
     matched_skills = sum(1 for skill in user_skills if skill in project_skills)
     if project_skills:
         coverage = matched_skills / len(project_skills)
@@ -152,8 +161,7 @@ def score_single_project(project, user_skills, level, interest, time_availabilit
 def get_recommendations(skills_string, level, interest, time_availability):
     user_skills = parse_skills(skills_string)
     all_projects = load_all_projects()
-
-    scored = []
+    scored_projects = []
     for project in all_projects:
         rule_score = score_single_project(
             project,
@@ -162,7 +170,6 @@ def get_recommendations(skills_string, level, interest, time_availability):
             interest,
             time_availability,
         )
-
         similarity_score = ml_similarity_score(
             project,
             user_skills,
@@ -171,21 +178,20 @@ def get_recommendations(skills_string, level, interest, time_availability):
             time_availability,
             all_projects,
         )
-
-    # Sort projects in descending order so the
-    # most relevant recommendations appear first.
-    scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
         final_score = rule_score + similarity_score
-
         if final_score > 0:
             scored_projects.append({
                 "project": project,
                 "score": final_score,
             })
-
-    scored_projects.sort(key=lambda item: item["score"], reverse=True)
-
+    # Sort projects in descending order so the
+    # most relevant recommendations appear first.
+    scored_projects.sort(key=lambda item: (item["score"], item["project"].get("id", 0)), reverse=True)
     return [item["project"] for item in scored_projects[:MAX_RESULTS]]
+
+VALID_LEVELS = ["beginner", "intermediate", "advanced"]
+VALID_TIME_AVAILABILITY = ["low", "medium", "high"]
+
 
 def validate_recommendation_inputs(skills, level, interest, time_availability):
     errors = []
