@@ -1,13 +1,13 @@
 // DevPath client-side behavior.
 
+var POINTS_PER_SEARCH = 5;
+var POINTS_PER_VIEW = 10;
+var POINTS_PER_CODE_OPEN = 15;
+var POINTS_PER_COMPLETION = 30;
+var PROGRESS_MAX_POINTS = 450;
+
 (function () {
   var html = document.documentElement;
-
-  var POINTS_PER_SEARCH = 5;
-  var POINTS_PER_VIEW = 10;
-  var POINTS_PER_CODE_OPEN = 15;
-  var POINTS_PER_COMPLETION = 30;
-  var PROGRESS_MAX_POINTS = 450;
 
   function applyTheme(theme) {
     var isDark = theme === "dark";
