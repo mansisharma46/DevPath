@@ -645,6 +645,22 @@ updateProfileWidgets();
 
     var footer = document.createElement("div");
     footer.className = "project-card-footer";
+
+    if (typeof DevPathBookmarks !== "undefined") {
+      var saveBtn = document.createElement("button");
+      saveBtn.type = "button";
+      saveBtn.className = "btn-save-project";
+      saveBtn.setAttribute("data-save-project-id", project.id);
+      var isSaved = DevPathBookmarks.isSaved(project.id);
+      if (isSaved) saveBtn.classList.add("saved");
+      saveBtn.setAttribute("aria-pressed", isSaved ? "true" : "false");
+      DevPathBookmarks.setButtonContent(saveBtn, isSaved);
+      saveBtn.addEventListener("click", function () {
+        DevPathBookmarks.toggle(project, saveBtn);
+      });
+      footer.appendChild(saveBtn);
+    }
+
     var link = document.createElement("a");
     link.className = "btn-details";
     link.textContent = "View Full Project";
@@ -731,19 +747,44 @@ updateProfileWidgets();
     skillWrap.addEventListener("click", function () { skillsInput.focus(); });
   }
 
+  // Toggle dropdown on button click
+  var dropdownToggle = document.getElementById("skills-dropdown-toggle");
+  if (dropdownToggle) {
+    dropdownToggle.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var isExpanded = suggestions.style.display === "block";
+      if (isExpanded) {
+        hideSuggestions();
+      } else {
+        var unselectedSkills = availableSkills.filter(function (skill) {
+          return !isSelected(skill);
+        });
+        showSuggestions(unselectedSkills);
+      }
+    });
+  }
+
+  function resetFormAndState() {
+    form.reset();
+    selectedSkills = [];
+    renderSelectedChips();
+    syncSkillsHiddenInput();
+    updateQuickPickState();
+    clearAllErrors();
+    hideSuggestions();
+    resultsSection.style.display = "none";
+    if (skillsInput) skillsInput.focus();
+  }
+
   var clearBtn = document.getElementById("clear-filters-btn");
   if (clearBtn) {
-    clearBtn.addEventListener("click", function () {
-      form.reset();
-      selectedSkills = [];
-      renderSelectedChips();
-      syncSkillsHiddenInput();
-      updateQuickPickState();
-      clearAllErrors();
-      hideSuggestions();
-      resultsSection.style.display = "none";
-      skillsInput.focus();
-    });
+    clearBtn.addEventListener("click", resetFormAndState);
+  }
+
+  var inlineResetBtn = document.getElementById("reset-form-btn");
+  if (inlineResetBtn) {
+    inlineResetBtn.addEventListener("click", resetFormAndState);
   }
 
   var resetProgressBtn = document.getElementById("reset-progress-btn");

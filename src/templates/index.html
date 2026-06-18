@@ -874,7 +874,7 @@
                 
                 <!-- Reset button and Inline GitHub Trigger -->
                 <div style="display: flex; gap: 3px; align-items: center;">
-                   <button type="reset" id="clear-filters-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
+                   <button type="reset" id="reset-form-btn" class="btn-clear" style="padding: 4px 12px; font-size: 0.75rem;">
                     Reset
                   </button>
                 <div class="github-inline-trigger" id="github-trigger-wrap" style="line-height: 1.2;">
@@ -1023,6 +1023,8 @@
               <span class="form-hint">Include coding, debugging, learning, and reviewing time in your estimate.</span>
               <div class="form-error-msg" id="time-error"></div>
             </div>
+
+            <div class="form-error-msg" id="form-error-general"></div>
 
             <div class="form-actions">
               <button type="submit" class="btn-submit" id="submit-btn">
@@ -1267,6 +1269,7 @@
   </button>
 
   <script src="/static/script.js"></script>
+  <script src="/static/bookmarks.js"></script>
   
   <script>
     // Tab switching for leaderboard/achievements (adds to your existing JS)
@@ -1294,9 +1297,6 @@
   </script>
     
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-
-  <script src="/static/script.js"></script>
-  </script>
 </body>
 
 </html>
