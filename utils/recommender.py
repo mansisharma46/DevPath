@@ -22,6 +22,21 @@ SCORING_WEIGHTS = {
     "time": 1,
 }
 
+WEIGHT_SKILL = SCORING_WEIGHTS["skill"]
+WEIGHT_LEVEL = SCORING_WEIGHTS["level"]
+WEIGHT_INTEREST = SCORING_WEIGHTS["interest"]
+WEIGHT_TIME = SCORING_WEIGHTS["time"]
+
+VALID_INTERESTS = {
+    "web", "data", "education", "automation", "games",
+    "cybersecurity", "devops", "mobile", "machine learning/ai",
+    "artificial intelligence", "cloud computing", "mobile app development",
+    "backend", "tools", "productivity", "business logic"
+}
+VALID_TIMES = {"low", "medium", "high"}
+
+# Common aliases and abbreviations for skills
+# This improves recommendation accuracy by normalizing user input
 SKILL_ALIASES = {
     "js": "javascript",
     "py": "python",
